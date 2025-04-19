@@ -5,7 +5,6 @@ const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
-const logger = require('morgan');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
 const dotenv = require('dotenv');
@@ -25,12 +24,33 @@ dotenv.config({ path: '.env.example' });
  */
 const secureTransfer = process.env.BASE_URL.startsWith('https');
 
-// Consider adding a proxy such as cloudflare for production.
+/**
+ * Rate limiting configuration
+ * This is a basic rate limiting configuration. You may want to adjust the settings
+ * based on your application's needs and the expected traffic patterns.
+ * Alos, consider adding a proxy such as cloudflare for production.
+ */
+// Global Rate Limiter Config
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200, // Limit each IP to 200 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+// Strict Auth Rate Limiter Config for signup, password recover, account verification, login by email
+const strictLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // 5 attempts per hour
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Login Rate Limiter Config
+const loginLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // 10 attempts per hour
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // This logic for numberOfProxies works for local testing, ngrok use, single host deployments
@@ -52,6 +72,11 @@ const contactController = require('./controllers/contact');
  * API keys and Passport configuration.
  */
 const passportConfig = require('./config/passport');
+
+/**
+ * Request logging configuration
+ */
+const { morganLogger } = require('./config/morgan');
 
 /**
  * Create Express server.
@@ -77,8 +102,8 @@ app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.set('trust proxy', numberOfProxies);
+app.use(morganLogger());
 app.use(compression());
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
@@ -141,6 +166,7 @@ app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/@popperjs/c
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
 app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
 app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+app.use('/image-cache', express.static(path.join(__dirname, 'tmp/image-cache'), { maxAge: 31557600000 }));
 
 /**
  * Analytics IDs needed thru layout.pug; set as express local so we don't have to pass them with each render call
@@ -154,15 +180,16 @@ app.locals.FACEBOOK_PIXEL_ID = process.env.FACEBOOK_PIXEL_ID ? process.env.FACEB
  */
 app.get('/', homeController.index);
 app.get('/login', userController.getLogin);
-app.post('/login', userController.postLogin);
+app.post('/login', loginLimiter, userController.postLogin);
+app.get('/login/verify/:token', loginLimiter, userController.getLoginByEmail);
 app.get('/logout', userController.logout);
 app.get('/forgot', userController.getForgot);
-app.post('/forgot', userController.postForgot);
+app.post('/forgot', strictLimiter, userController.postForgot);
 app.get('/reset/:token', userController.getReset);
-app.post('/reset/:token', userController.postReset);
+app.post('/reset/:token', loginLimiter, userController.postReset);
 app.get('/signup', userController.getSignup);
 app.post('/signup', userController.postSignup);
-app.get('/contact', contactController.getContact);
+app.get('/contact', strictLimiter, contactController.getContact);
 app.post('/contact', contactController.postContact);
 app.get('/account/verify', passportConfig.isAuthenticated, userController.getVerifyEmail);
 app.get('/account/verify/:token', passportConfig.isAuthenticated, userController.getVerifyEmailToken);
@@ -195,15 +222,18 @@ app.get('/api/paypal/success', apiController.getPayPalSuccess);
 app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/lob', apiController.getLob);
 app.get('/api/upload', lusca({ csrf: true }), apiController.getFileUpload);
-app.post('/api/upload', apiController.uploadMiddleware, lusca({ csrf: true }), apiController.postFileUpload);
-app.get('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getPinterest);
-app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
+app.post('/api/upload', strictLimiter, apiController.uploadMiddleware, lusca({ csrf: true }), apiController.postFileUpload);
 app.get('/api/here-maps', apiController.getHereMaps);
 app.get('/api/google-maps', apiController.getGoogleMaps);
 app.get('/api/google/drive', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getGoogleDrive);
 app.get('/api/chart', apiController.getChart);
 app.get('/api/google/sheets', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getGoogleSheets);
 app.get('/api/quickbooks', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getQuickbooks);
+app.get('/api/trakt', apiController.getTrakt);
+app.get('/api/openai-moderation', apiController.getOpenAIModeration);
+app.post('/api/openai-moderation', apiController.postOpenAIModeration);
+app.get('/api/togetherai-classifier', apiController.getTogetherAIClassifier);
+app.post('/api/togetherai-classifier', apiController.postTogetherAIClassifier);
 
 /**
  * OAuth authentication routes. (Sign in)
@@ -244,8 +274,8 @@ app.get('/auth/steam', passport.authorize('steam-openid'));
 app.get('/auth/steam/callback', passport.authorize('steam-openid', { failureRedirect: '/api' }), (req, res) => {
   res.redirect(req.session.returnTo);
 });
-app.get('/auth/pinterest', passport.authorize('pinterest'));
-app.get('/auth/pinterest/callback', passport.authorize('pinterest', { failureRedirect: '/login' }), (req, res) => {
+app.get('/auth/trakt', passport.authorize('trakt'));
+app.get('/auth/trakt/callback', passport.authorize('trakt', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo);
 });
 app.get('/auth/quickbooks', passport.authorize('quickbooks'));

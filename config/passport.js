@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const passport = require('passport');
 const refresh = require('passport-oauth2-refresh');
-const axios = require('axios');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { Strategy: FacebookStrategy } = require('passport-facebook');
 const { Strategy: TwitterStrategy } = require('@passport-js/passport-twitter');
@@ -587,12 +586,18 @@ passport.use(
         }
 
         const userInfoURL = 'https://api.tumblr.com/v2/user/info';
-        const response = await axios.get(userInfoURL, {
+        const response = await fetch(userInfoURL, {
           headers: { Authorization: getTumblrAuthHeader(userInfoURL, 'GET') },
         });
 
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
         // Extract user info from the API response
-        const tumblrUser = response.data.response.user;
+        const tumblrUser = data.response.user;
         if (!user.tumblr) {
           user.tumblr = tumblrUser.name; // Save Tumblr username
         }
@@ -646,8 +651,12 @@ passport.use(
           user.steam = steamId;
           user.tokens.push({ kind: 'steam', accessToken: steamId });
           try {
-            const res = await axios.get(profileURL);
-            const profileData = res.data.response.players[0];
+            const response = await fetch(profileURL);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            const profileData = data.response.players[0];
             user.profile.name = user.profile.name || profileData.personaname;
             user.profile.picture = user.profile.picture || profileData.avatarmedium;
             await user.save();
@@ -659,7 +668,11 @@ passport.use(
           }
         } else {
           try {
-            const { data } = await axios.get(profileURL);
+            const response = await fetch(profileURL);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
             const profileData = data.response.players[0];
             const user = new User();
             user.steam = steamId;
@@ -679,57 +692,6 @@ passport.use(
     },
   ),
 );
-
-/**
- * Pinterest API OAuth.
- */
-const pinterestStrategyConfig = new OAuth2Strategy(
-  {
-    authorizationURL: 'https://www.pinterest.com/oauth',
-    tokenURL: 'https://api.pinterest.com/v5/oauth/token',
-    clientID: process.env.PINTEREST_ID,
-    clientSecret: process.env.PINTEREST_SECRET,
-    callbackURL: `${process.env.BASE_URL}/auth/pinterest/callback`,
-    passReqToCallback: true,
-    state: generateState(),
-    scope: ['user_accounts:read', 'pins:read', 'pins:write', 'boards:read'],
-    customHeaders: {
-      Authorization: `Basic ${Buffer.from(`${process.env.PINTEREST_ID}:${process.env.PINTEREST_SECRET}`).toString('base64')}`,
-    },
-  },
-  async (req, accessToken, refreshToken, params, profile, done) => {
-    try {
-      const user = await User.findById(req.user._id);
-      if (!user.pinterest) {
-        const pinterestUserResponse = await axios.get('https://api.pinterest.com/v5/user_account', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const pinterestUser = pinterestUserResponse.data;
-        user.pinterest = pinterestUser.id;
-        if (pinterestUser.website_url) {
-          user.profile.website = pinterestUser.website_url;
-        }
-        if (
-          !user.profile.picture &&
-          // && pinterestUser.account_type === 'PINNER'
-          pinterestUser.profile_image &&
-          !pinterestUser.profile_image.includes('default')
-        ) {
-          user.profile.picture = pinterestUser.profile_image;
-        }
-      }
-      const updatedUser = await saveOAuth2UserTokens(req, accessToken, refreshToken, params.expires_in, params.refresh_token_expires_in, 'pinterest');
-      await user.save();
-      return done(null, updatedUser);
-    } catch (err) {
-      return done(err);
-    }
-  },
-);
-passport.use('pinterest', pinterestStrategyConfig);
-refresh.use('pinterest', pinterestStrategyConfig);
 
 /**
  * Intuit/QuickBooks API OAuth.
@@ -758,6 +720,49 @@ const quickbooksStrategyConfig = new OAuth2Strategy(
 );
 passport.use('quickbooks', quickbooksStrategyConfig);
 refresh.use('quickbooks', quickbooksStrategyConfig);
+
+/**
+ * trakt.tv API OAuth.
+ */
+const traktStrategyConfig = new OAuth2Strategy(
+  {
+    authorizationURL: 'https://api.trakt.tv/oauth/authorize',
+    tokenURL: 'https://api.trakt.tv/oauth/token',
+    clientID: process.env.TRAKT_ID,
+    clientSecret: process.env.TRAKT_SECRET,
+    callbackURL: `${process.env.BASE_URL}/auth/trakt/callback`,
+    state: generateState(),
+    passReqToCallback: true,
+  },
+  async (req, accessToken, refreshToken, params, profile, done) => {
+    try {
+      const response = await fetch('https://api.trakt.tv/users/me?extended=full', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'trakt-api-version': 2,
+          'trakt-api-key': process.env.TRAKT_ID,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      const user = await saveOAuth2UserTokens(req, accessToken, refreshToken, params.expires_in, params.x_refresh_token_expires_in, 'trakt', {
+        trakt: data.ids.slug,
+      });
+      user.profile.name = user.profile.name || data.name;
+      user.profile.location = user.profile.location || data.location;
+      await user.save();
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  },
+);
+passport.use('trakt', traktStrategyConfig);
+refresh.use('trakt', traktStrategyConfig);
 
 /**
  * Login Required middleware.

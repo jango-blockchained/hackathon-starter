@@ -15,16 +15,16 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
 
 ### Testimonials
 
-> [**“Nice! That README alone is already gold!”**](https://www.producthunt.com/tech/hackathon-starter#comment-224732)<br>
+> [**"Nice! That README alone is already gold!"**](https://www.producthunt.com/tech/hackathon-starter#comment-224732)<br>
 > — Adrian Le Bas
 
-> [**“Awesome. Simply awesome.”**](https://www.producthunt.com/tech/hackathon-starter#comment-224966)<br>
+> [**"Awesome. Simply awesome."**](https://www.producthunt.com/tech/hackathon-starter#comment-224966)<br>
 > — Steven Rueter
 
-> [**“I'm using it for a year now and many projects, it's an awesome boilerplate and the project is well maintained!”**](https://www.producthunt.com/tech/hackathon-starter#comment-228610)<br>
+> [**"I'm using it for a year now and many projects, it's an awesome boilerplate and the project is well maintained!"**](https://www.producthunt.com/tech/hackathon-starter#comment-228610)<br>
 > — Kevin Granger
 
-> **“Small world with Sahat's project. We were using his hackathon starter for our hackathon this past weekend and got some prizes. Really handy repo!”**<br>
+> **"Small world with Sahat's project. We were using his hackathon starter for our hackathon this past weekend and got some prizes. Really handy repo!"**<br>
 > — Interview candidate for one of the companies I used to work with.
 
 <h4 align="center">Modern Theme</h4>
@@ -53,7 +53,7 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
 - [Recommended Design Resources](#recommended-design-resources)
 - [Recommended Node.js Libraries](#recommended-nodejs-libraries)
 - [Recommended Client-side Libraries](#recommended-client-side-libraries)
-- [Pro Tips](#pro-tips)
+- [Using AI Assistants](#using-ai-assistants)
 - [FAQ](#faq)
 - [How It Works](#how-it-works-mini-guides)
 - [Cheatsheets](#cheatsheets)
@@ -70,7 +70,7 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
 ## Features
 
 - Login
-  - **Local Authentication** using Email and Password
+  - **Local Authentication** using Email and Password, as well as Passwordless
   - **OAuth 2.0 Authentication:** Sign in with Google, Facebook, X (Twitter), Twitch, Github
   - **OpenID Connect:** Sign in with LinkedIn
 - **User Profile and Account Management**
@@ -85,9 +85,15 @@ I also tried to make it as **generic** and **reusable** as possible to cover mos
 - Contact Form (powered by SMTP via Sendgrid, Mailgun, AWS SES, etc.)
 - File upload
 - **API Examples**
-  - Facebook, Foursquare, Tumblr (OAuth 1.0a example), Pinterest, Github, Steam, Quickbooks, Paypal, Stripe, Twilio (text messaging), Lob (USPS Mail), HERE Maps, Google Maps, Google Drive, Google Sheets, Alpha Vantage (stocks and finance info) with ChartJS, Last.fm, New York Times, Web Scraping
+
+  - **AI:** OpenAI Moderation, Together AI foundational model LLMs (aka Deepseek, Llama, Mistral, etc.)
+  - **Backoffice:** Lob (USPS Mail), Paypal, Quickbooks, Stripe, Twilio (text messaging)
+  - **Data, Media & Entertainment:** Alpha Vantage (stocks and finance info) with ChartJS, Github, Foursquare, Last.fm, New York Times, Trakt.tv (movies/TV), Twitch, Tumblr (OAuth 1.0a example), Web Scraping
+  - **Maps and Location:** Google Maps, HERE Maps
+  - **Productivity:** Google Drive, Google Sheets
+
 - Flash notifications
-- reCaPTCHA and rate limit protection
+- reCAPTCHA and rate limit protection
 - CSRF protection
 - MVC Project Structure
 - Node.js clusters support
@@ -158,11 +164,11 @@ _What to get and configure:_
 
 - Email address
 
-  - Set SITE_CONTACT_EMAIL as your incoming email address for messages sent to you thru the contact form.
-  - Set TRANSACTION_EMAIL as the "From" address for emails sent to users thru the lost password or email verification emails to users. You may set this to the same address as SITE_CONTACT_EMAIL.
+  - Set SITE_CONTACT_EMAIL as your incoming email address for messages sent to you through the contact form.
+  - Set TRANSACTION_EMAIL as the "From" address for emails sent to users through the lost password or email verification emails to users. You may set this to the same address as SITE_CONTACT_EMAIL.
 
 - ngrok and HTTPS
-  If you want to use some API that needs HTTPS to work (for example Pinterest or Facebook),
+  If you want to use some API that needs HTTPS to work (for example Github or Facebook),
   you will need to download [ngrok](https://ngrok.com/). Start ngrok, set your BASE_URL to the forwarding address (i.e `https://3ccb-1234-abcd.ngrok-free.app` ), and use the forwarding address to access your application. If you are using a proxy like ngrok, you may get a CSRF mismatch error if you try to access the app at `http://localhost:8080` instead of the https://...ngrok-free.app address.
 
   After installing or downloading the standalone ngrok client you can start ngrok to intercept the data exchanged on port 8080 with `./ngrok http 8080` in Linux or `ngrok http 8080` in Windows.
@@ -179,11 +185,11 @@ See:
 
 # Obtaining API Keys
 
-You will need to obtain appropriate credentials (Client ID, Client Secret, API Key, or Username & Password) for API and service provides which you need. See Step 2 in the Getting started section for more info.
+You will need to obtain appropriate credentials (Client ID, Client Secret, API Key, or Username & Password) for API and service providers which you need. See Step 2 in the Getting started section for more info.
 
 ## SMTP
 
-Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_USER, SMTP_PASSWORD, and SMTP_HOST environment variables accordingly. When picking the smtp host, keep in mind that the app is configured to use secure SMTP transmissions over port 465 out of the box. You have the flexibility to select any provider that suits your needs or take advantage of one of the following providers, each offering a free tier for your convenience.
+Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_USER, SMTP_PASSWORD, and SMTP_HOST environment variables accordingly. When picking the SMTP host, keep in mind that the app is configured to use secure SMTP transmissions over port 465 out of the box. You have the flexibility to select any provider that suits your needs or take advantage of one of the following providers, each offering a free tier for your convenience.
 
 | Provider | Free Tier                  | Website                 |
 | -------- | -------------------------- | ----------------------- |
@@ -243,11 +249,11 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
 - Visit <a href="https://cloud.google.com/console/project" target="_blank">Google Cloud Console</a>
 - Click on the **Create Project** button
 - Enter _Project Name_, then click on **Create** button
-- Then click on _APIs & auth_ in the sidebar and select _API_ tab
-- Click on **Google+ API** under _Social APIs_, then click **Enable API**
-- Click on **Google Drive API** under _G Suite_, then click **Enable API**
-- Click on **Google Sheets API** under _G Suite_, then click **Enable API**
-- Next, under _APIs & auth_ in the sidebar click on _Credentials_ tab
+- Then click on _APIs & auth_ in the sidebar and select _API_ tab and based on your usage add:
+  - Login by Google: Click on **Google+ API** under _Social APIs_, then click **Enable API**
+  - Google Drive: Click on **Google Drive API** under _G Suite_, then click **Enable API**
+  - Google Sheets: Click on **Google Sheets API** under _G Suite_, then click **Enable API**
+- Next, under _APIs & auth_ in the sidebar click on the _Credentials_ tab
 - Click on **Create new Client ID** button
 - Select _Web Application_ and click on **Configure Consent Screen**
 - Fill out the required fields then click on **Save**
@@ -257,6 +263,10 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
 - **Authorized redirect URI**: set to your BASE_URL value followed by /auth/google/callback (i.e. `http://localhost:8080/auth/google/callback` )
 - Click on **Create Client ID** button
 - Copy and paste _Client ID_ and _Client secret_ keys into `.env`
+
+**Warning:** Restrict your **Google Maps API key** to the "Maps JavaScript API" and the specific domain name you are using (for example, your ngrok development domain). Avoid using "localhost" or leaving the key unrestricted, because your Maps API key will be publicly exposed through the web application. This exposure could allow unauthorized users to misuse your key, potentially resulting in charges to your GCP account and credit card.
+
+- Google Maps API Key: To use the "Maps JavaScript API," you must activate your Google Cloud Platform account with a valid credit card. If your account hasn't been activated yet, this process will also trigger the countdown for the expiration of your free credits if any. If you'd prefer to avoid this, consider using **HERE Maps** as an alternative. To get a key add the Search for "Maps Platform API Key" in your GCP Console and select the appropriate option. Then get your key and add your domain as the Website restriction for it.
 
 <hr>
 
@@ -346,6 +356,18 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
 
 <hr>
 
+<img src="https://i.imgur.com/Adtl9qg.png" height="75">
+
+- Sign up or sign in to your trakt.tv account and go to <a href="https://trakt.tv/oauth/applications" target="_blank">Trakt.tv Applications</a>.
+- Create a new application and fill in the required fields:
+  - **Name**: Your app name.
+  - **Redirect URI**: Set to your BASE_URL value followed by `/auth/trakt/callback` (i.e. `http://localhost:8080/auth/trakt/callback` or `ngrokURL/auth/trakt/callback`)
+  - Leave the JavaScript origins blank as we won't be using client-side API calls.
+- Click **Save App**.
+- Copy and paste the **Client ID** and **Client Secret** into your `.env` file as `TRAKT_ID` and `TRAKT_SECRET` or set them as your environment variables.
+
+<hr>
+
 <img src="https://i.imgur.com/gUngyyW.png" height="50">
 
 - Go to <a href="http://www.tumblr.com/oauth/apps" target="_blank">http://www.tumblr.com/oauth/apps</a>
@@ -380,6 +402,27 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
 
 <hr>
 
+<img src="https://i.imgur.com/iCsCgp6.png" height="75">
+
+The OpenAI moderation API for checking harmful inputs is free to use as long as you have paid credits in your OpenAI developer account. The cost of using their other models depends on the model, as well as the input and output size of the API call.
+
+- Visit <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI API Keys</a>
+- Sign in or create an OpenAI account.
+- Click on **Create new secret key** to generate an API key.
+- Copy and paste the generated API key into your `.env` file as `OPENAI_API_KEY` or set it as an environment variable.
+
+<hr>
+
+<img src="https://i.imgur.com/dOCkJxT.png" height="50">
+
+- Visit <a href="https://www.together.ai" target="_blank">Together AI</a>
+- Sign in or create a Together AI account.
+- Click on **Create API Key** to generate a new key. You will also be able to access your API key under your account settings in the API Keys tab.
+- Copy and paste the generated API key into your `.env` file as `TOGETHERAI_API_KEY` or set it as an environment variable.
+- Go to Together AI's <a href="https://api.together.ai/models" target="_blank"> Models</a> page and pick a model based on your usecase and budget and specify it the `TOGETHERAI_MODEL` in your `.env` file or as an environment variable (e.g. `togethercomputer/llama-3-70b-chat`).
+
+<hr>
+
 <img src="https://i.imgur.com/QMjwCk6.png" height="50">
 
 - Sign in at <a href="https://developer.x.com/" target="_blank">https://developer.x.com/</a>
@@ -393,6 +436,8 @@ Obtain SMTP credentials from a provider for transactional emails. Set the SMTP_U
 - Click **Update this X's applications settings**
 - Copy and paste _Consumer Key_ and _Consumer Secret_ keys into `.env` file
 
+<hr>
+
 ## Web Analytics
 
 This project supports integrating web analytics tools such as Google Analytics 4 and Facebook Pixel, along with Open Graph metadata for social sharing. Below are instructions to help you set up these features in your application.
@@ -400,15 +445,15 @@ This project supports integrating web analytics tools such as Google Analytics 4
 ### Google Analytics 4 Setup
 
 - Go to [Google Analytics](https://analytics.google.com)
-- Create a new GA4 property to cerate a Measurement ID.
+- Create a new GA4 property so you create a Measurement ID.
 - Copy and paste your Measurement ID into `.env` file or set it up as an env variable
 
 ### Facebook Pixel
 
-**Optional:** It is highly recommanded to setup a business with Facebook that your personal account along with others you authorize can manage. You would need to Go to [Meta Business Suite](https://business.facebook.com/), register a business and add a business page and your website as an asset for the business.
+**Optional:** It is highly recommended to set up a business with Facebook that your personal account along with others you authorize can manage. You would need to Go to [Meta Business Suite](https://business.facebook.com/), register a business and add a business page and your website as an asset for the business.
 
 - Go to [Meta Event Manager](https://www.facebook.com/events_manager)
-- If you have setup a business, switch from your personal to your business account and pick your business asset using the drop down in the upper right corner of the page.
+- If you have set up a business, switch from your personal to your business account and pick your business asset using the drop down in the upper right corner of the page.
 - Use the Connect Data option to add a Web data source and create a Pixel ID
 - Copy and paste the Pixel ID into `.env` file for FACEBOOK_PIXEL_ID or set it up as an environment variable
 
@@ -420,6 +465,7 @@ The metadata for Open Graph is only set up for the home page (`home.pug`). Updat
 
 | Name                             | Description                                                          |
 | -------------------------------- | -------------------------------------------------------------------- |
+| **config**/morgan.js             | Configuration for request logging with morgan.                       |
 | **config**/nodemailer.js         | Configuration and helper function for sending email with nodemailer. |
 | **config**/passport.js           | Passport Local and OAuth strategies, plus login middleware.          |
 | **controllers**/api.js           | Controller for /api route and all api examples.                      |
@@ -472,10 +518,10 @@ Required to run the project before your modifications
 | @octokit/rest                 | GitHub API library.                                                   |
 | @passport-js/passport-twitter | X (Twitter) login support (OAuth 2).                                  |
 | @popperjs/core                | Frontend js library for poppers and tooltips.                         |
-| axios                         | HTTP client.                                                          |
 | bootstrap                     | CSS Framework.                                                        |
 | bootstrap-social              | Social buttons library.                                               |
-| chart.js                      | Frontend js library for creating charts.                              |
+| bowser                        | User agent parser                                                     |
+| chart.js                      | Front-end js library for creating charts.                             |
 | cheerio                       | Scrape web pages using jQuery-style syntax.                           |
 | compression                   | Node.js compression middleware.                                       |
 | connect-mongo                 | MongoDB session store for Express.                                    |
@@ -579,9 +625,43 @@ Required during code development for testing, Hygiene, code styling, etc.
 - [drop.js](http://github.hubspot.com/drop/docs/welcome/) - Powerful Javascript and CSS library for creating dropdowns and other floating displays.
 - [scrollReveal.js](https://github.com/jlmakes/scrollReveal.js) - Declarative on-scroll reveal animations.
 
-## Pro Tips
+## Using AI Assistants
 
-- Need to find a specific object inside an Array? Use [\_.find](http://lodash.com/docs#find) function from Lodash. For example, this is how you would retrieve Twitch token from database: `const token = _.find(req.user.tokens, { kind: 'twitch' });`, where 1st parameter is an array, and a 2nd parameter is an object to search for.
+AI tools and large language models (LLMs) can greatly accelerate your ramp-up time, efficiency, and productivity during hackathons. Many of these tools are available for free and offer features that can significantly enhance your coding experience.
+
+You have two main options for accessing these tools:
+
+- **Web-based chat interfaces**: Platforms like [ChatGPT](https://chat.openai.com/) and [MS Copilot](https://copilot.microsoft.com/)
+- **Integrated code assistants**: Tools like [Amazon Q (CodeWhisperer)](https://aws.amazon.com/q/developer/pricing/), [GitHub Copilot](https://github.com/features/copilot), and Gemini Code Assist integrate directly into code editors, such as Visual Studio Code.
+
+Integrated tools, like plugins for Visual Studio Code, let you reference your code directly without needing to copy-paste, making them easier to use in many cases. Web-based assistants, on the other hand, require manual copy-pasting but can offer a different approach without impacting the "context" for your integrated tool. Tools and models perform differently depending on their update cycles, so results may vary. If an integrated tool struggles with a task, try copy-pasting the relevant code into a web assistant to troubleshoot. A good starting point is combining Amazon Q and MS Copilot, as these tools tend to produce fewer issues like outdated syntax, vulnerable code, or incomplete solutions compared to other assistants.
+
+### Providing Context to AI Tools
+
+Context for LLMs is the additional information that the model needs to make sense of how it should respond to your question, which in coding is probably your existing code, example implementation, or specifications that you might copy-paste or pass to the model. Keep in mind that integrated assistants may not automatically include your project files as the context and may try to answer your question without looking at your code. To include the context:
+
+- **Amazon Q**: Use `@[filename]` to specify a file or `@workspace` to include the entire project.
+- **GitHub Copilot**: Click the "Add Context" button in the chat and manually add specific files or choose Codebase for full project context. Note that you need to set the copilot mode to "Ask", "Edit", etc based on your intended conversation.
+
+### Example Prompts to Get You Started
+
+**Explaining Code and Concepts**
+
+- "Can you explain how this project handles sanitization of user inputs?"
+- "What does function `x` in file `y` do?" (_Copy-paste code into a web-based assistant if using one._)
+- "Can you walk me through what this regex does?"
+
+**Adding New Features**
+
+- "I want to add login functionality for [OAuth2 provider]. The project already includes similar logins for other providers. Can you guide me through the required changes to `app.js`, `config/passport.js`, `models/User.js`, and the relevant views?"  
+  _Pro Tip:_ If the assistant misses some changes, follow up with specific files or provide relevant documentation for better accuracy.
+- "Can you help me design an addition to this project to do the following. I don't need any code yet, and want to work on the design and refine it before moving to an implementation. --- continue with a bullet point list of your requirements"
+
+**Debugging or Fixing Code**
+
+- "I modified the function `x` below to achieve `y`, but I get the following error. Can you help me fix it? --- Can have blocks afterward with a header like `==== error ====` and `==== function x ====` afterward."
+- "Can you help me fix a bug in the following function or function `x`. It is supposed to return `y` when it gets input `i` but it is returning `z`."
+- "Can you check my comments for spelling issues?".
 
 ## FAQ
 
@@ -1253,11 +1333,11 @@ You will need to install docker and docker-compose on your system. If you are us
 After installing docker, start the application with the following commands :
 
 ```
-# To build the project while supressing most of the build messages
+# To build the project while suppressing most of the build messages
 docker-compose build web
 
-# To build the project without supressing the build messages or using cached data
- docker-compose build --no-cache --progress=plain web
+# To build the project without suppressing the build messages or using cached data
+docker-compose build --no-cache --progress=plain web
 
 # To start the application (or to restart after making changes to the source code)
 docker-compose up web
@@ -1268,42 +1348,19 @@ To view the app, find your docker IP address + port 8080 ( this will typically b
 
 ## Deployment
 
-Using a local instance on your laptop with ngrok is a good solution for your demo during the hackathon, and you wouldn't necessorily need to deploy to a cloud platform. If we wish to have your app run 24x7 for general audiance, once you are ready to deploy your app, you will need to create an account with a cloud platform to host it. There are a number of cloud service providers out there that you can research. Service providers like AWS provide a free tier of service which can help you get started with just some minor costs (such as traffic overage if any, etc).
+Using a local instance on your laptop with ngrok is a good solution for your demo during the hackathon, and you wouldn't necessarily need to deploy to a cloud platform. If you wish to have your app run 24x7 for a general audience, once you are ready to deploy your app, you will need to create an account with a cloud platform to host it. There are a number of cloud service providers out there that you can research. Service providers like AWS and Azure provide a free tier of service which can help you get started with just some minor costs (such as traffic overage if any, etc).
 
 ---
 
-### AWS
-
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/512px-Amazon_Web_Services_Logo.svg.png" width="100">
-
-[AWS Free Tier](https://aws.amazon.com/free) provides 12 months of compute (EC2 Windows or Linux) for free. AWS has up-to-date guides and instructions for setting up your host.
-
-| Service                                                                                                                                   | Setup                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="https://icon.icepanel.io/AWS/svg/Compute/EC2.svg" width="50"><br>**EC2 Instance**                                               | EC2 is the compute server to host your application. You can run your application on your EC2 instance similar to how your run applications on your computer.<br><br>**Setup Steps:**<br>1. Create an AWS account and/or login to AWS console<br>2. In the search bar search for "EC2", and then pick EC2 from the services<br>3. Click on Launch an instance<br>4. Pick an OS image and Instance type. You can go with a free-tier one to try EC2 before upgrading to an instance that matches your traffic and application requiremnts<br>5. Under the Network settings, Create a security group, but remove checkboxes from Allow SSH, HTTPS, and HTTP. You will expose the proper ports later<br>6. You can go with the defaults for the remaining setting as long as they match with the free-tier if that is what you are choosing to use<br>7. Launch the instance, and wait for it to be provisioned |
-| <img src="https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Virtual-Private-Cloud.svg" width="50"><br>**VPC / Security Group** | A security group controls the traffic that is allowed to reach and leave the resources that it is associated with. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| <img src="https://icon.icepanel.io/AWS/svg/Developer-Tools/CodeDeploy.svg" width="50"><br>**CodeDeploy**                                  | AWS CodeDeploy is a deployment service that automates application deployments to various compute platforms such as Amazon EC2 instances, on-premises instances, serverless AWS Lambda functions, and Amazon ECS services. You can use it to have your instance auto-update from your git repo like github, bitbucket, etc. Note that using the CodeDeploy service would require S3 storage usage as well. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| <img src="https://icon.icepanel.io/AWS/svg/Compute/App-Runner.svg" width="50"><br>**App Runner**                                          | If your application is stable and you expect surges of traffic, you can move from direct EC2 deployment to AWS App Runner which can scale the number of hosts that the application runs on up and down depending on the traffic to your host. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| <img src="https://icon.icepanel.io/AWS/svg/Compute/Elastic-Beanstalk.svg" width="50"><br>**Elastic Beanstalk**                            | You can use an Elastic Beanstalk deployment instead of an EC2 deployment of your application. When using Elastic Beanstalk deployments you are just provided with a code execution environemnt and you are no longer required to maintain the OS for the server (i.e. Windows or Linux security patching, etc.) <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| <img src="https://icon.icepanel.io/AWS/svg/Containers/Elastic-Container-Service.svg" width="50"><br>**Elastic Container Service**         | ECS is the fully managed AWS container service that enables you to run docker containers on EC2 instances. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| <img src="https://icon.icepanel.io/AWS/svg/Compute/Fargate.svg" width="50"><br>**Fargate**                                                | Fargate takes your container deployment to the next level by moving you to a serverless setup for running containers. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| <img src="https://icon.icepanel.io/AWS/svg/Compute/Bottlerocket.svg" width="50"><br>**Bedrock**                                           | Bedrock provides serverless access to use Foundational LLM models such as Llama, Amazon Titan, Amazon Nova, etc. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| <img src="https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/CloudFront.svg" width="50"><br>**CloudFront**                      | You can use AWS CloudFront as the edge service that fronts client requests. CloudFront can cache static content to reduce resource usage and speed up data delivery. It can also serve as an extra later of security because your application server isn't directly exposed to the internet traffic. <br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| <img src="https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/CloudFront.svg" width="50"><br>**Simple Email Service**            | You can use AWS SES just like an SMTP server. Don't try to setup an email server on your EC2 instance to send out email, use SES. Note that SES strictly enforces anti-spam rules, so don't send anything that a recipent may mark as spam as it will get reported back to AWS. If **1%** of your emails get reported as spam by recipients AWS will suspend your SES service. Also you should setup mail setting such as spf, DMARC and DKIM so others can't spoof your email address causing your domain to get tagged as a spam domain, since it may cause automated spam marking of your emails by email service providers such as gmail, yahoo, etc.<br><br>**Setup Steps:**<br>1. ---.<br>2. ---.<br>3. ---.<br>4. ---.<br>                                                                                                                                                                           |
-
----
-
-### Hosted MongoDB Atlas (can be on AWS)
+### Hosted MongoDB Atlas
 
 <img src="https://www.mongodb.com/assets/images/global/MongoDB_Logo_Dark.svg" width="200">
-
-You can create an account with **MongoDB Atlas** and then pick one of the providers below which could be AWS for the deployment.
 
 - Go to [https://www.mongodb.com/](https://www.mongodb.com/)
 - Click the green **Try free** button
 - Fill in your information then hit **Create your Atlas account**
 - You will be redirected to Create New Cluster page.
-- Select a **Cloud Provider and Region** (such as AWS and a free tier region)
+- Select a **Cloud Provider and Region**
 - Select cluster Tier to Free forever **Shared** Cluster
 - Give Cluster a name (default: Cluster0)
 - Click on green **:zap:Create Cluster button**
